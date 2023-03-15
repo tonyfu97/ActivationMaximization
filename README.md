@@ -1,6 +1,9 @@
 # Deep Dream at the Neuron Level
 UW CSE 455 Final Project
 
+For details, please visit the [project website](https://github.com/tonyfu97/DeepDreamAtNeuronLevel)
+
+File structure:
 ```shell
 .
 ├── LICENSE
