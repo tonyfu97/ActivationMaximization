@@ -62,7 +62,12 @@ model_name_menu.addEventListener('change', async (event) => {
     conv_i = parseInt(layer.match(/\d+/)[0]) - 1
     num_units = rf_data[model_name].nums_units[conv_i];
     unit_id_input.max = num_units - 1;
+
+    sess = new onnx.InferenceSession();
+    loadingModelPromise = await sess.loadModel(`./onnx_files/${model_name}_${layer}.onnx`);
+
     load_img();
+    updateCanvasSize(model_name, conv_i);
 });
 
 // layer dropdown menu logic:
@@ -71,13 +76,19 @@ layer_menu.addEventListener('change', async (event) => {
     conv_i = parseInt(layer.match(/\d+/)[0]) - 1
     num_units = rf_data[model_name].nums_units[conv_i];
     unit_id_input.max = num_units - 1;
+
+    sess = new onnx.InferenceSession();
+    loadingModelPromise = await sess.loadModel(`./onnx_files/${model_name}_${layer}.onnx`);
+
     load_img();
+    updateCanvasSize(model_name, conv_i);
 });
 
 // unit input form logic:
 unit_id_input.addEventListener('change', (event) => {
     unit_id = parseInt(unit_id_input.value);
     load_img();
+    updateCanvasSize(model_name, conv_i);
 });
 
 /////////////////////////// LOAD IMAGE FROM AWS S3 ////////////////////////////
@@ -89,13 +100,13 @@ https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/s3-example-pho
 var albumBucketName = 'rfmapping';
 AWS.config.region = 'us-west-2'; // Region
 AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-  IdentityPoolId: 'us-west-2:495c99f0-9773-4aef-9e01-29b3c4127e50',
+    IdentityPoolId: 'us-west-2:495c99f0-9773-4aef-9e01-29b3c4127e50',
 });
 
 // create a new service object
 var s3 = new AWS.S3({
-  apiVersion: '2006-03-01',
-  params: {Bucket: albumBucketName}
+    apiVersion: '2006-03-01',
+    params: {Bucket: albumBucketName}
 });
 
 // utility function to create HTML.
@@ -105,8 +116,8 @@ function getHtml(template) {
 
 // show the photos that exist in an album.
 function load_img() {
-  var img_url_top_patch = `https://s3.us-west-2.amazonaws.com/rfmapping/SGD/top_patch_initialized/${model_name}/${layer}/${unit_id}.png`;
-  document.getElementById('gradientAscentImage').src = img_url_top_patch;
+    var img_url_top_patch = `https://s3.us-west-2.amazonaws.com/rfmapping/SGD/top_patch_initialized/${model_name}/${layer}/${unit_id}.png`;
+    document.getElementById('gradientAscentImage').src = img_url_top_patch;
 };
 load_img();
 
@@ -122,19 +133,29 @@ let isDrawing = false;
 let brushColor = colorPicker.value;
 let brushSize = brushSizeInput.value;
 
-canvas.width = 300;
-canvas.height = 300;
+// Canvas sizing
+let canvas_size = rf_data[model_name].xn[conv_i];
+
+// Canvas dimension logic: (scaled to the neuron's RF size)
+const updateCanvasSize = (model_name, conv_i) => {
+    canvas_size = rf_data[model_name].xn[conv_i];
+
+    canvas.height = canvas_size;
+    canvas.width = canvas_size;
+}
+updateCanvasSize(model_name, conv_i);
 
 canvas.addEventListener('mousedown', startDrawing);
 canvas.addEventListener('mousemove', draw);
 canvas.addEventListener('mouseup', stopDrawing);
 
 colorPicker.addEventListener('change', (e) => {
-  brushColor = e.target.value;
+    brushColor = e.target.value;
 });
 
 brushSizeInput.addEventListener('change', (e) => {
-  brushSize = e.target.value;
+    brushSize = e.target.value;
+    document.getElementById("brush-size-display").innerHTML = brushSize;
 });
 
 unmuteButton.addEventListener('click', () => {
@@ -146,16 +167,14 @@ unmuteButton.addEventListener('click', () => {
     if (unmuteButton.classList.contains('active')) {
         unmuteButton.style.backgroundColor = 'green';
         unmuteButton.textContent = 'Mute';
-        // Add the code to unmute the sound here
     } else {
         unmuteButton.style.backgroundColor = '';
         unmuteButton.textContent = 'Unmute';
-        // Add the code to mute the sound here
     }
+    spike.muted = !spike.muted;
 }
 
 const resetButton = document.getElementById('reset');
-
 resetButton.addEventListener('click', resetCanvas);
 
 function startDrawing(e) {
@@ -175,9 +194,64 @@ function draw(e) {
 
 function resetCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    updatePredictions()
 }
 
 function stopDrawing() {
     isDrawing = false;
     ctx.closePath();
+    updatePredictions()
 }
+
+///////////////////////////// ONNX MODEL //////////////////////////////////////
+
+// Load model.
+let sess = new onnx.InferenceSession();
+let loadingModelPromise = sess.loadModel(`./onnx_files/${model_name}_${layer}.onnx`);
+let response = 0;
+
+
+// Get prediction. This function is called whenever the mouse is moved.
+async function updatePredictions() {
+    const imgData = ctx.getImageData(0, 0, canvas_size, canvas_size).data;
+    // imgData is 1D array with length 1 * 4 * xn * xn.
+
+    // Reshape 1D array into [1, 3, xn, xn] (but still flattens it).
+    let rgbArray = new Float32Array(3 * canvas_size * canvas_size);
+    let idx = 0
+    for (var rgb_i = 0; rgb_i < 3; rgb_i++) { // RGB only (ignoring the 4th channel)
+        for (var i = 0; i < canvas_size; i++) { // Height
+            for (var j = 0; j < canvas_size; j++) { // Width
+                let offset = (i * canvas_size * 4) + (j * 4) + rgb_i
+                // Change color range from [0, 255] to [-1, 1).
+                rgbArray[idx++] = (imgData[offset] - 128) / 128;
+            }
+        }
+    }
+    const input = new onnx.Tensor(rgbArray, "float32", [1, 3, canvas_size, canvas_size]);
+    await loadingModelPromise;
+    const outputMap = await sess.run([input]);
+    const outputTensor = outputMap.values().next().value;
+    const responses = outputTensor.data;
+
+    let element = document.getElementById('response');
+    let output_size = Math.sqrt(responses.length / num_units)
+    let unit_id_flatten = ((output_size ** 2) * unit_id) - 1 + (output_size * Math.floor(output_size/2)) + Math.ceil(output_size/2);
+    response = responses[unit_id_flatten];
+    element.innerHTML = `Response = ${Math.round(response * 100) / 100}`;
+};
+
+// Continuously playing spike sound even when mouse is not moving:
+var spike = document.getElementById("audio");
+let MAX_VOLUME = 5;
+canvas.addEventListener('mouseover',
+    event => {
+    setInterval(() => {
+        if (!spike.muted && response > 0) {
+        spike.volume = Math.min(response/MAX_VOLUME, 1);
+        spike.play();
+        }
+    }, 100);
+});
+
+
