@@ -1,0 +1,98 @@
+/* Set default font family and color */
+body {
+font-family: Arial, sans-serif;
+color: #333;
+}
+
+/* Style the header */
+header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 1em;
+background-color: #f2f2f2;
+}
+
+/* Style text */
+h1 {
+margin: 0;
+font-size: 2em;
+}
+h3 {
+font-size: 1;
+}
+
+/* Style the button */
+button {
+padding: 1em 1em;
+background-color: #333;
+color: #fff;
+border: none;
+border-radius: 0.25em;
+font-size: 1em;
+cursor: pointer;
+}
+
+/* Style the link inside the button */
+button a {
+color: #fff;
+text-decoration: none;
+}
+
+button:hover {
+background-color: #555;
+}
+
+/* Style the form elements */
+label {
+display: block;
+margin: 1em 0;
+font-size: 1.2em;
+}
+
+select,
+input[type="number"] {
+padding: 0.5em;
+font-size: 1em;
+border-radius: 0.25em;
+border: none;
+background-color: #f2f2f2;
+}
+
+/* Style the image container */
+#img_div {
+margin: 2em 0;
+text-align: center;
+display: grid;
+grid-template-columns:1fr 1fr 1fr;
+}
+
+/* Add some spacing between form elements */
+br {
+margin: 1em 0;
+}
+
+
+/* Style the list items */
+ul li {
+margin-bottom: 0.5em;
+}
+
+/* Style the strong tag within list items */
+ul li strong {
+color: #444;
+font-weight: bold;
+}
+
+/* Style the link */
+a {
+color: #1a73e8;
+text-decoration: none;
+}
+
+/* Style the link on hover */
+a:hover {
+text-decoration: underline;
+}
+
+    

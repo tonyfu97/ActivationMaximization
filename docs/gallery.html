@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradient Ascent Gallery</title>
+</head>
+<body>
+    <header>
+        <h1>Deep Dream at Neuron Level: Gallery</h1>
+        <button><a href="index.html">Main Page</a></button>
+    </header>
+    
+    <label for="model_name">Choose a model: </label>
+    <select id="model_name">
+        <option value="alexnet">AlexNet</option>
+        <option value="vgg16">Vgg16</option>
+        <option value="resnet18">ResNet18</option>
+    </select>
+    <br>
+
+    <!-- Layer drop down menu -->
+    <label for="layer">Choose a layer: </label>
+    <select id="layer">
+        <option value="conv1">conv1</option>
+    </select>
+    <br>
+
+    <!-- Unit id input -->
+    <label for="unit_id" id="unit_id_label">Choose a unit: </label>
+    <input type="number" id="unit_id" name="unit_id" min="0" max="0" value="0">
+    <br>
+
+
+    <p><strong>Note:</strong> The two intialization methods will result in the same images in conv1 (because the first layer by itself is linear). Try the other layers to see what happens. Also, Vgg16 and ResNet18 are currently not supported.</p>
+
+    <!-- Show map image -->
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1289.0.min.js"></script>
+    <div id="img_div"></div>
+
+    <h4>Explanations of the figures:</h4>
+    <ul>
+    <li><strong>Zero-Initialized:</strong> Gradient ascent is performed without providing any prior information. The starting tensor is made of zeros.</li>
+    <li><strong>Top-patch Initialized:</strong> The image patch that results in the strongest response of the unit (i.e., artificial neuron) is used as the starting tensor for gradient ascent.</li>
+    <li><strong>Top Patch (original):</strong> The top image patch (within the 50,000 ImageNet test set) was identified by my previous research. See the <a href="index.html">Main page</a> to learn more.</li>
+    </ul>
+    
+</body>
+<script type="module" src="js/gallery.js"></script>
+<link rel="stylesheet" href="css/gallery.css">
+</html>

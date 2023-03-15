@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playground</title>
+    <link rel="stylesheet" href="css/playground.css">
+    <script src="js/playground.js" defer></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1289.0.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Playground</h1>
+        <nav>
+            <button><a href="index.html">Main Page</a></button>
+        </nav>
+    </header>
+
+    
+    <h2>Instructions</h2>
+    <p>This playground allows you to interact with network directly. The gradient ascent visualization (right to the canvas) is shown. Select a unit in the specified neural network and layer, then draw on the canvas. The content of the canvas will be fed into the network. The response of the unit will be displayed. <strong>Note:</strong> Vgg16 and ResNet18 are not fully supported.</p>
+
+    <h2>Controls</h2>
+    <div class="controls">
+        <label for="model">Model:</label>
+        <select id="model">
+            <option value="alexnet">alexnet</option>
+            <option value="vgg16">Vgg16</option>
+            <option value="resnet18">ResNet18</option>
+        </select>
+
+        <label for="layer">Layer:</label>
+        <select id="layer">
+            <option value="conv1">conv1</option>
+        </select>
+
+        <label for="unit-index">Unit Index:</label>
+        <input type="number" id="unit-index" name="unit_id" min="0" max="0" value="0">
+
+        <button id="unmute">Unmute</button>
+
+        <label for="color">Color:</label>
+        <input type="color" id="color">
+
+        <label for="brush-size">Brush Size:</label>
+        <input type="number" id="brush-size" min="1">
+
+        <label>
+            <button id="reset">Reset Canvas</button>
+        </label>
+    </div>
+
+    <div class="canvas-container">
+        <img id="gradientAscentImage" width="500" alt="Gradient Ascent Image" />
+        <canvas id="canvas"></canvas>
+    </div>
+  
+</div>
+</body>
+</html>
