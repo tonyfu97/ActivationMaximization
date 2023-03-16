@@ -79,7 +79,7 @@ def get_max_min_indicies(layer_name):
                                       MODEL_NAME,f"{layer_name}.npy")
     return np.load(spatial_index_path).astype(int)
 """
-I feel the need to explain what these spatial indices are all about. This was an idea that was developed by Dr. Wyeth Bair and his PhD student, Dr. Dean Pospisil. They trained neural networks on the 50,000 images mentioned earlier. As a reminder, the convolution (or more accurately, cross-correlation) operation slides the unit's kernel along the two spatial dimensions of the input. The first thing they did was to find the spatial locations that produced the maximum (most positive) responses. They repeated this process for all 50,000 images, and then ranked the resulting max locations to find out which image patches gave the strongest responses.
+I feel the need to explain what these spatial indices are all about. This was an idea that was developed by Dr. Wyeth Bair and his PhD student, Dr. Dean Pospisil. They presented  the 50,000 images to the neural networks. As a reminder, the convolution (or more accurately, cross-correlation) operation slides the unit's kernel along the two spatial dimensions of the input. The first thing they did was to find the spatial locations that produced the maximum (most positive) responses. They repeated this process for all 50,000 images, and then ranked the resulting max locations to find out which image patches gave the strongest responses
 
 `MAX_MIN_INDICES` contains the results of this ranking for a particular convolutional layer of a model. The array has dimensions [num_units, 100, 4].
 

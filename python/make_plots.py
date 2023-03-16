@@ -43,8 +43,16 @@ for i, layer_name in enumerate(LAYER_NAMES):
     plt.hist(layer_corr, bins=bins)
     plt.title(layer_name)
     plt.xlim([-1.1, 1.1])
-plt.show()
+# plt.show()
+plt.close()
 
 # Summarize the trend in a single plot, too.
+plt.figure(figsize=(16,8))
 plt.boxplot(all_layer_corr, labels=LAYER_NAMES)
+plt.ylabel('Pearson corr. coeff.', fontsize=20)
+plt.title(f"{MODEL_NAME}: Zero- vs. Top-Patch Initializations", fontsize=20)
+plt.tick_params(axis='both', labelsize=20)  
+plt.savefig(os.path.join(CURRENT_DIR, os.pardir, 'results', OPTIMIZATION_METHOD,
+                         'correlation', f"{MODEL_NAME}_zero_vs_top_patch.png"))
 plt.show()
+plt.close()
