@@ -63,6 +63,27 @@ height: auto;
 margin: 1em 0;
 }
 
+/* Pseudocode containers */
+.pseudocode_container {
+background-color: #f5f5d1;
+padding: 1em;
+border-radius: 4px;
+font-family: "Courier New", Courier, monospace;
+}
+
+/* Indent inner lists */
+.pseudocode_container ul ul {
+margin-left: 2em;
+}
+
+/* File tree containers */
+.file_tree_container {
+background-color: #d2cfcf;
+padding: 1em;
+border-radius: 4px;
+font-family: "Courier New", Courier, monospace;
+}
+
 /* References list */
 ul {
 list-style-type: none;

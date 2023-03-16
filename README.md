@@ -1,9 +1,10 @@
-# Deep Dream at the Neuron Level
+# DeepDream at the Neuron Level
 UW CSE 455 Final Project
 
-For details, please visit the [project website](https://github.com/tonyfu97/DeepDreamAtNeuronLevel)
+For details, please visit the [project website](https://tonyfu97.github.io/DeepDreamAtNeuronLevel/)
 
-File structure:
+
+
 ```shell
 .
 ├── LICENSE
@@ -15,31 +16,31 @@ File structure:
 │       ├── resnet18
 │       └── vgg16
 ├── docs
-│   ├── css
-│   │   ├── gallery.css
-│   │   ├── index.css
-│   │   └── playground.css
-│   ├── gallery.html
-│   ├── images
 │   ├── index.html
+│   ├── gallery.html
+│   ├── playground.html
+│   ├── css
+│   │   ├── index.css
+│   │   ├── gallery.css
+│   │   └── playground.css
 │   ├── js
 │   │   ├── gallery.js
 │   │   └── playground.js
 │   ├── onnx_files
-│   ├── playground.html
+│   ├── images
 │   └── spike.m4a
 ├── python
-│   ├── convert_to_onnx.py
-│   ├── correlate_different_initializations.py
-│   ├── grad_ascent.py
-│   ├── grad_ascent_animation.py
-│   ├── image_utils.py
-│   ├── make_plots.py
-│   ├── make_top_patch_initialized_grad_ascent.py
-│   ├── make_top_patch_png.py
-│   ├── make_zero_initialized_grad_ascent.py
-│   ├── model_utils.py
 │   ├── requirements.txt
+│   ├── convert_to_onnx.py
+│   ├── grad_ascent_animation.py
+│   ├── make_top_patch_png.py
+│   ├── make_top_patch_initialized_grad_ascent.py
+│   ├── make_zero_initialized_grad_ascent.py
+│   ├── correlate_different_initializations.py
+│   ├── make_plots.py
+│   ├── grad_ascent.py
+│   ├── image_utils.py
+│   ├── model_utils.py
 │   ├── spatial_utils.py
 │   └── tensor_utils.py
 ├── results

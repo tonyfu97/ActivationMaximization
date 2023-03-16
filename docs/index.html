@@ -3,45 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deep Dream at the Neuron Level</title>
+    <title>DeepDream at the Neuron Level</title>
     <link rel="stylesheet" href="css/index.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
 </head>
 <body>
     <header>
         <nav>
-            <button><a href="playground.html">Playground</a></button>
+            <button><a href="playground.html">Playground (beta)</a></button>
             <button><a href="gallery.html">Gallery</a></button>
             <button><a href="https://github.com/tonyfu97/DeepDreamAtNeuronLevel">GitHub</a></button>
         </nav>
     </header>
 
-    <h1>Deep Dream at the Neuron Level</h1>
+    <h1>DeepDream at the Neuron Level</h1>
     <p>Tony Fu, Bair Lab, March 2023</p>
 
-    <h2>1. Introduction to Deep Dream</h2>
-    <p>Deep Dream is a technique developed by Google that uses neural networks to generate artistic images. It works by feeding an image through a trained neural network and then modifying the image to enhance the features that the network detects. This process, called gradient ascent, can be repeated multiple times to create surreal, dream-like images.</p>
-    <img src="gradient_ascent_figure.jpg" alt="Gradient ascent figure">
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/your_video_id" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <h2>1. Introduction to DeepDream</h2>
+    <p>Deep Dream is a technique developed by Google that employs neural networks to generate artistic images. At the core of DeepDream lies a method known as Gradient Ascent. In contrast to regular Gradient Descent, as shown in the pseudocode below, Gradient Ascent is primarily focused on determining the extent to which a parameter contributes to the error in classification. This contribution is measured by taking the derivative of the loss function with respect to the parameter. We then take a tiny step in the opposite direction to achieve the locally steepest descent. By repeating this process iteratively, we hope to find the parameters that minimize the loss.</p>
+    <iframe width="560" src="https://www.youtube.com/embed/your_video_id" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
-    <h2>2. Motivation: Why Study at the Neuron Level?</h2>
-    <p>Studying Deep Dream at the neuron level helps us better understand how individual neurons contribute to the overall image generation process. This knowledge can lead to improvements in neural network architectures and training methods, as well as new ways to create artistic images using neural networks.</p>
+    <div class="pseudocode_container">
+        <p><strong>Gradient Descent Pseudocode:</strong></p>
+        <ul>
+            <li>Input: \( \gamma \) (learning rate), \( \theta_0 \) (parameters), \( f(\theta) \) (loss), \( N \) (max iterations)</li>
+            <li>for \( t = 1 \ldots N \):</li>
+            <ul>
+                <li>\( g \leftarrow \nabla_\theta f( \theta_{t - 1}) \)</li>
+                <li>\( \theta_t \leftarrow \theta_{t - 1} - \gamma g_t \)</li>
+            </ul>
+            <li>Return: \( \theta_N \)
+        </ul>
+    </div>
+    <p>However, gradient ascent is not typically employed to update the parameters. Instead, DeepDream uses it to iteratively modify an input image such that it increasingly elicits a stronger response from a specific channel of the convolutional layer. Observe that the pseudocode below and see how it differs from that of the gradient descent.</p>
+    <div class="pseudocode_container">
+        <p><strong>Gradient Ascent Pseudocode:</strong></p>
+        <ul>
+            <li>Input: \( \gamma \) (learning rate), \( \rho_0 \) (pixel values), \( z(\rho) \) (response), \( N \) (max iterations)</li>
+            <li>for \( t = 1 \ldots N \):</li>
+            <ul>
+                <li>\( g \leftarrow \nabla_\rho z( \rho_{t - 1}) \)</li>
+                <li>\( \rho_t \leftarrow \rho_{t - 1} + \gamma g_t \)</li>
+            </ul>
+            <li>Return: \( \rho_N \)
+        </ul>
+    </div>
+    <p>The two pseudocodes differ in three ways: First, we replace the parameters \( \theta \) with pixel values \( \rho \) because we are updating the image, not the parameters. Second, we replace the loss function \( f \) with the response function \( z \) (I am hesitant to call it an "activation" because I believe the term "activation" should be reserved for the value after the response has been passed through an activation function). Third, instead of subtracting the gradient, we add it. That is, in every iteration, we head in the direction with the steepest increase in the response.</p>
+
+    <h2>2. Preexisting Work and Motivation: Why Study at the Neuron Level?</h2>
+    <p>DeepDream was introduced way back in 2015 (<a href="https://ai.googleblog.com/2015/06/inceptionism-going-deeper-into-neural.html">blog post</a>). What makes this project novel? We know that DeepDream works by increasing the response of a specific channel within the convolutional layer. A channel is composed of a kernel that is applied across the x and y spatial dimensions of the input. However, only a few locations (if any) contain the features that would enhance the responses. What DeepDream accomplishes is the amplification of features that a kernel prefers at all spatial locations. Just think about it, how many images do you know of contain the same feature at every spatial location? This is why DeepDream remains an artistic tool today rather than a scientific one. I argue that in order to use DeepDream as a tool for interpretable machine learning, we must narrow our focus to a single spatial location, specifically at the neuron level.</p>
+
+    <p>My principal investigator (PI), Dr. Bair, along with his former Ph.D. student Dr. Dean Pospisil, and Dr. Pasupathy, proposed studying neural networks at the neuron level. They termed this approach <a href="https://elifesciences.org/articles/38242">Artiphysiology</a> because it applies neurophysiology to artificial intelligence systems. This method enables easier comparisons between biological and artificial neurons. Using this approach, they investigated whether the primate mid-level visual area V4 neurons' ability to distinguish curvature shapes as a function of angular position is also found in <a href="https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html">AlexNet</a>. Their research found a correspondence between the two.</p>
+
+    <p>The figure below illustrates the concept of Artiphysiology with regard to receptive field mapping. In <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1359523/">Hubel and Wiesel's seminal cat experiment</a>, they used a narrow, moving bar of light to stimulate the cat's retina. By systematically varying the orientation, position, and direction of movement of the light bar, they were able to map the so-called "receptive fields" (i.e., specific regions of the sensory space that a neuron is sensitive to) of individual neurons in the cat's visual cortex. This approach revealed that different neurons were selectively responsive to specific features such as the orientation and direction of movement of edges or lines in the visual field.</p>
+
     <img width="560" src="images/artiphysiology.jpg" alt="Artiphysiology overview figure">
 
-    <h2>3. Method: How to Study at the Neuron Level and Dataset Used</h2>
-    <p>To study Deep Dream at the neuron level, we perform gradient ascent on individual neurons within the network, observing the resulting images and comparing them to the images generated by the full network. The dataset used in this study is the ImageNet dataset, which contains millions of images spanning thousands of categories.</p>
-    <a href="https://github.com/tonyfu97/DeepDreamAtNeuronLevel">GitHub Repository</a>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/jw6nBWo21Zk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+    <p>Their work revolutionized our understanding of the visual system and demonstrated the hierarchical organization of the visual cortex. In fact, the hierarchical organization of convolutional neural networks (CNNs) draws inspiration from the biological visual system (<a href="https://link.springer.com/article/10.1007/BF00342633"> Fukushima, 1975</a>). Artiphysiology aims to apply similar techniques used in the study of biological vision to investigate neural networks, which can be a valuable source of knowledge about the mechanisms of visual processing. By examining the response properties of artificial neurons in neural networks, researchers can gain insights into the computational principles.</p>
+
+    <h2>3. Method</h2>
+    <h3>Previous work</h3>
+    <p>Below is the file structure of the project. Please visit the <a href="https://github.com/tonyfu97/DeepDreamAtNeuronLevel">GitHub repository</a> for the source code:</p>
+    <div class="file_tree_container">
+        <pre><code>
+            .
+            ├── LICENSE
+            ├── README.md
+            ├── docs
+            │   ├── index.html
+            │   ├── gallery.html
+            │   ├── playground.html
+            │   ├── css
+            │   │   ├── index.css
+            │   │   ├── gallery.css
+            │   │   └── playground.css
+            │   ├── js
+            │   │   ├── gallery.js
+            │   │   └── playground.js
+            │   ├── onnx_files
+            │   ├── images
+            │   └── spike.m4a
+            ├── python
+            │   ├── requirements.txt
+            │   ├── convert_to_onnx.py
+            │   ├── grad_ascent_animation.py
+            │   ├── make_top_patch_png.py
+            │   ├── make_top_patch_initialized_grad_ascent.py
+            │   ├── make_zero_initialized_grad_ascent.py
+            │   ├── correlate_different_initializations.py
+            │   ├── make_plots.py
+            │   ├── grad_ascent.py
+            │   ├── image_utils.py
+            │   ├── model_utils.py
+            │   ├── spatial_utils.py
+            │   └── tensor_utils.py
+        </code></pre>
+    </div>
+
+    <!-- TODO: required to include this for grading. rephrase later. -->
+    <p><strong>Previous work:</strong> I wrote <code>spatial_utils.py</code> last summer for research, and I referenced <a href="https://github.com/gordicaleksa/pytorch-deepdream">gordicaleksa's code</a> to implement <code>gradient_ascent.py</code> (with significant modification). The <a href="playground.html">Playground web application</a> is a modified version of a <a href="https://tonyfu97.github.io/rf_playground/">web application</a> I wrote last year, inspired by <a href="https://github.com/elliotwaite/pytorch-to-javascript-with-onnx-js">elliotwaite's work</a>. The rest of the code are implemented for the project.</p>
+
+    <h3>Dataset</h3>
+    <p>The dataset used in the project is a subset of ImageNet's test set. It consists of 50,000 images. They were already preprocessed into NumPy arrays with shape <code>3 x 227 x 277</code>. The RGD values were batch-normalized to be roughly in the range of -1.0 to +1.0. I could not upload the dataset to the GitHub repository because it is too big (about 62 GB without compression). Please visit <a href="http://wartburg.biostr.washington.edu/loc/course/artiphys/data/i50k.html">our lab website</a> for downloading the dataset.</p>
+
+    <h3>Choice of Optimizer</h3>
+    <p>The actual implementation of <code>grad_ascent.py</code> is slightly more complex. Instead of manually adding the gradient, I utilized the <code>SGD</code> and <code>Adam</code> optimizers provided by <a href="https://pytorch.org/docs/stable/optim.html"><code>torch.optim</code></a>. These optimizers enable me to incorporate momentum in the update process. It's worth noting that although SGD stands for Stochastic Gradient Descent, it's not truly stochastic in this case. I am only presenting one image at a time to the network, so there isn't a random minibatch to subsample from.</p>
+
     <img src="images/2_zero_initialized.gif" alt="AlexNet Conv2 Unit 2 Gradient Ascent">
+    <p>The GIF above displays AlexNet Conv2 Unit2 undergoing gradient ascent using three different optimizers, starting from an image composed of zeros. The result of the Adam optimizer is visually appealing and psychedelic, but it is too noisy and emphasizes parts of the image that aren't particularly important. I ultimately chose to use SGD without momentum, as I observed that adding momentum did not make a significant difference in many cases.</p>
+
+    <h3>Choice of Initial Image</h3>
+    <p>My intial plan when starting this project is to develop an method that can map the receptive fields of the neurons without supplying the neural networks and meaningful stimulus. Currently, the receptive field of the neuron can be mapped using gradient methods and perturbation methods. There are many incredible resources available online:</p>
+
+    <ul>
+        <li><a href="https://captum.ai/api/">Captum library: Model Interpretability for PyTorch</a></li>
+        <li><a href="https://github.com/jphall663/awesome-machine-learning-interpretability">jphall663's list of resources</a></li>
+        <li><a href="https://github.com/utkuozbulak/pytorch-cnn-visualizations">utkuozbulak's implementations</a></li>
+        <li><a href="https://github.com/hans66hsu/nn_interpretability">hans66hsu's implementations</a></li>
+    </ul>
+
+
+    <p>This was an idea that was developed by Dr. Wyeth Bair and his PhD student, Dr. Dean Pospisil. They trained neural networks on the 50,000 images mentioned earlier. As a reminder, the convolution (or more accurately, cross-correlation) operation slides the unit's kernel along the two spatial dimensions of the input. The first thing they did was to find the spatial locations that produced the maximum (most positive) responses. They repeated this process for all 50,000 images, and then ranked the resulting max locations to find out which image patches gave the strongest responses.</p>
+    
+
+    <div class="pseudocode_container">
+        <p><strong>Top-Patch Initialized Gradient Ascent Pseudocode:</strong></p>
+        <ul>
+            <li>All else remains the same.</li>
+            <li>Return: \( \rho_N \) - \( \rho_0 \)
+        </ul>
+    </div>
 
     <h2>4. Results</h2>
-    <p>For a gallery of the results, please visit the following link:</p>
+    <p>Please visit the <a href="gallery.html">Gallery</a> to see more results.</p>
+    
     <img width="1000" src="images/alexnet_zero_vs_top_patch.png" alt="AlexNet Results">
-    <a href="gallery.html">Gallery</a>
 
     <h2>5. References</h2>
     <ul>
-        <li><a href="paper1_url">Paper 1</a></li>
-        <li><a href="paper2_url">Paper 2</a></li>
-        <li><a href="paper3_url">Paper 3</a></li>
+        <li><a href="https://ai.googleblog.com/2015/06/inceptionism-going-deeper-into-neural.html">A. Mordvintsev, C. Olah, and M. Tyka, "Inceptionism: Going Deeper into Neural Networks," Google Research Blog, June 17, 2015.</a></li>
+        <li><a href="https://elifesciences.org/articles/38242">D. A. Pospisil, A. Pasupathy, and W. Bair, "Artiphysiology' reveals V4-like shape tuning in a deep network trained for image classification," eLife, vol. 7, e38242, Dec. 2018.</a></li>
+        <li><a href="https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html">A. Krizhevsky, I. Sutskever, and G. E. Hinton, "ImageNet classification with deep convolutional neural networks," in Advances in Neural Information Processing Systems 25 (NIPS 2012), F. Pereira, C. J. C. Burges, L. Bottou, and K. Q. Weinberger, Eds. Curran Associates, Inc., 2012, pp. 1097-1105.</a></li>
+        <li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1359523/">D. H. Hubel and T. N. Wiesel, "Receptive fields, binocular interaction and functional architecture in the cat's visual cortex," J. Physiol., vol. 160, no. 1, pp. 106-154, Jan. 1962.</a></li>
+
+        <li><a href="https://link.springer.com/article/10.1007/BF00342633">K. Fukushima, "Cognitron: A self-organizing multilayered neural network," Biol. Cybern., vol. 20, no. 3-4, pp. 121-136, 1975.</a></li>
     </ul>
 </body>
 </html>
