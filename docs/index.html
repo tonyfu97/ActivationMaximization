@@ -20,8 +20,10 @@
     <p>Tony Fu, Bair Lab, March 2023</p>
 
     <h2>1. Introduction to DeepDream</h2>
+
+    <iframe width="560" src="https://youtu.be/y3xN06_xzJQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
     <p>Deep Dream is a technique developed by Google that employs neural networks to generate artistic images. At the core of DeepDream lies a method known as Gradient Ascent. In contrast to regular Gradient Descent, as shown in the pseudocode below, Gradient Ascent is primarily focused on determining the extent to which a parameter contributes to the error in classification. This contribution is measured by taking the derivative of the loss function with respect to the parameter. We then take a tiny step in the opposite direction to achieve the locally steepest descent. By repeating this process iteratively, we hope to find the parameters that minimize the loss.</p>
-    <iframe width="560" src="https://www.youtube.com/embed/your_video_id" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
     <div class="pseudocode_container">
         <p><strong>Gradient Descent Pseudocode:</strong></p>
@@ -61,7 +63,7 @@
 
     <iframe width="560" height="315" src="https://www.youtube.com/embed/jw6nBWo21Zk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-    <p>Their work revolutionized our understanding of the visual system and demonstrated the hierarchical organization of the visual cortex. In fact, the hierarchical organization of convolutional neural networks (CNNs) draws inspiration from the biological visual system (<a href="https://link.springer.com/article/10.1007/BF00342633"> Fukushima, 1975</a>). Artiphysiology aims to apply similar techniques used in the study of biological vision to investigate neural networks, which can be a valuable source of knowledge about the mechanisms of visual processing. By examining the response properties of artificial neurons in neural networks, researchers can gain insights into the computational principles.</p>
+    <p>Their work revolutionized our understanding of the visual system and demonstrated the hierarchical organization of the visual cortex. In fact, the hierarchical organization of convolutional neural networks (CNNs) draws inspiration from the biological visual system (<a href="https://link.springer.com/article/10.1007/BF00342633">Fukushima, 1975</a>). Artiphysiology aims to apply similar techniques used in the study of biological vision to investigate neural networks, which can be a valuable source of knowledge about the mechanisms of visual processing. By examining the response properties of artificial neurons in neural networks, researchers can gain insights into the computational principles.</p>
 
     <h2>3. Method</h2>
     <h3>Previous work</h3>
@@ -103,31 +105,31 @@
     </div>
 
     <!-- TODO: required to include this for grading. rephrase later. -->
-    <p><strong>Previous work:</strong> I wrote <code>spatial_utils.py</code> last summer for research, and I referenced <a href="https://github.com/gordicaleksa/pytorch-deepdream">gordicaleksa's code</a> to implement <code>gradient_ascent.py</code> (with significant modification). The <a href="playground.html">Playground web application</a> is a modified version of a <a href="https://tonyfu97.github.io/rf_playground/">web application</a> I wrote last year, inspired by <a href="https://github.com/elliotwaite/pytorch-to-javascript-with-onnx-js">elliotwaite's work</a>. The rest of the code are implemented for the project.</p>
+    <p>I wrote <code>spatial_utils.py</code> last summer for research, and I referenced <a href="https://github.com/gordicaleksa/pytorch-deepdream">gordicaleksa's code</a> to implement <code>gradient_ascent.py</code> (with significant modification). The <a href="playground.html">Playground web application</a> is a modified version of a <a href="https://tonyfu97.github.io/rf_playground/">web application</a> I wrote last year, inspired by <a href="https://github.com/elliotwaite/pytorch-to-javascript-with-onnx-js">elliotwaite's work</a>. The rest of the code are implemented for the project.</p>
 
     <h3>Dataset</h3>
     <p>The dataset used in the project is a subset of ImageNet's test set. It consists of 50,000 images. They were already preprocessed into NumPy arrays with shape <code>3 x 227 x 277</code>. The RGD values were batch-normalized to be roughly in the range of -1.0 to +1.0. I could not upload the dataset to the GitHub repository because it is too big (about 62 GB without compression). Please visit <a href="http://wartburg.biostr.washington.edu/loc/course/artiphys/data/i50k.html">our lab website</a> for downloading the dataset.</p>
 
     <h3>Choice of Optimizer</h3>
-    <p>The actual implementation of <code>grad_ascent.py</code> is slightly more complex. Instead of manually adding the gradient, I utilized the <code>SGD</code> and <code>Adam</code> optimizers provided by <a href="https://pytorch.org/docs/stable/optim.html"><code>torch.optim</code></a>. These optimizers enable me to incorporate momentum in the update process. It's worth noting that although SGD stands for Stochastic Gradient Descent, it's not truly stochastic in this case. I am only presenting one image at a time to the network, so there isn't a random minibatch to subsample from.</p>
+    <p>The actual implementation of <code>grad_ascent.py</code> is slightly more complex. Instead of manually adding the gradient, I utilized the <code>SGD</code> and <code>Adam</code> optimizers provided by <a href="https://pytorch.org/docs/stable/optim.html"><code>torch.optim</code></a>. These optimizers enable me to incorporate momentum in the update process. It's worth noting that although SGD stands for Stochastic Gradient Descent, it's not truly stochastic in this case. I am only presenting one image at a time to the network, so there isn't a random minibatch to sample from.</p>
 
     <img src="images/2_zero_initialized.gif" alt="AlexNet Conv2 Unit 2 Gradient Ascent">
     <p>The GIF above displays AlexNet Conv2 Unit2 undergoing gradient ascent using three different optimizers, starting from an image composed of zeros. The result of the Adam optimizer is visually appealing and psychedelic, but it is too noisy and emphasizes parts of the image that aren't particularly important. I ultimately chose to use SGD without momentum, as I observed that adding momentum did not make a significant difference in many cases.</p>
 
     <h3>Choice of Initial Image</h3>
-    <p>My intial plan when starting this project is to develop an method that can map the receptive fields of the neurons without supplying the neural networks and meaningful stimulus. Currently, the receptive field of the neuron can be mapped using gradient methods and perturbation methods. There are many incredible resources available online:</p>
+    <p>My initial plan when starting this project was to develop a method capable of mapping the receptive fields of neurons without providing the neural networks with any meaningful stimulus. Currently, receptive fields of neurons can be mapped using gradient and perturbation methods. There are numerous incredible resources available online:</p>
 
-    <ul>
-        <li><a href="https://captum.ai/api/">Captum library: Model Interpretability for PyTorch</a></li>
-        <li><a href="https://github.com/jphall663/awesome-machine-learning-interpretability">jphall663's list of resources</a></li>
-        <li><a href="https://github.com/utkuozbulak/pytorch-cnn-visualizations">utkuozbulak's implementations</a></li>
-        <li><a href="https://github.com/hans66hsu/nn_interpretability">hans66hsu's implementations</a></li>
+    <ul id="interpretability-resources-ul">
+        <li>• <a href="https://captum.ai/api/">Captum library: Model Interpretability for PyTorch</a></li>
+        <li>• <a href="https://github.com/jphall663/awesome-machine-learning-interpretability">jphall663's list of resources</a></li>
+        <li>• <a href="https://github.com/utkuozbulak/pytorch-cnn-visualizations">utkuozbulak's implementations</a></li>
+        <li>• <a href="https://github.com/hans66hsu/nn_interpretability">hans66hsu's implementations</a></li>
     </ul>
 
-
-    <p>This was an idea that was developed by Dr. Wyeth Bair and his PhD student, Dr. Dean Pospisil. They trained neural networks on the 50,000 images mentioned earlier. As a reminder, the convolution (or more accurately, cross-correlation) operation slides the unit's kernel along the two spatial dimensions of the input. The first thing they did was to find the spatial locations that produced the maximum (most positive) responses. They repeated this process for all 50,000 images, and then ranked the resulting max locations to find out which image patches gave the strongest responses.</p>
+    <p>However, those methods require natural images as input. To find the images (more accurately, image patches, since the receptive field size of a single neuron is almost always smaller than a typical image) that serve as good stimuli for the neurons, Dr. Bair and Dr. Pospisil presented the 50,000 images mentioned earlier to the neural network. As a reminder, the convolution (or more accurately, cross-correlation) operation slides the unit's kernel along the two spatial dimensions of the input. The first thing they did was to find the spatial locations that produced the maximum (most positive) responses. They repeated this process for all 50,000 images, and then ranked the resulting max locations to determine which image patches yielded the strongest responses. A drawback of this technique is that we are limited by the size of the dataset. What if there isn't an image patch in the dataset that activates the neuron? Also, by using natural images as stimuli for receptive field mapping, we are providing a strong prior that will influence the results. Unlike stimuli such as bars, gratings, and <a href="https://journals.physiology.org/doi/full/10.1152/jn.2001.86.5.2505?rfr_dat=cr_pub++0pubmed&url_ver=Z39.88-2003&rfr_id=ori%3Arid%3Acrossref.org">Pasupathy shapes</a>, it is difficult to describe natural images mathematically. Consequently, using natural images as stimuli makes it challenging to systematically characterize the neuron.</p>
     
-
+    <p>In this project, I experimented with two different initialization methods for gradient ascent: using an image consisting of zeros and using the image patch that produced the maximum response, which I refer to as the "top patch" for brevity. For gradient ascent initialized with the top patch, I subtracted the top patch from the resulting image, so that only the added gradients are displayed. The pseudocode for this process is provided below:</p>
+    
     <div class="pseudocode_container">
         <p><strong>Top-Patch Initialized Gradient Ascent Pseudocode:</strong></p>
         <ul>
@@ -137,9 +139,18 @@
     </div>
 
     <h2>4. Results</h2>
-    <p>Please visit the <a href="gallery.html">Gallery</a> to see more results.</p>
+    <p><strong>AlexNet Conv1 Unit2: </strong>In the figure below, the left panel displays the result of gradient ascent initialized with zeros. The middle panel presents the outcome of gradient ascent initialized with the top patch, and the right panel showcases the top patch itself. As you can observe, the three panels are nearly identical. This similarity occurs because, by itself, Conv1 is a linear operator, so the gradient at each step will just be the unit's kernel.</p>
+    <img width="1000" src="images/alexnet_conv1_unit2_gradient_ascent.png" alt="AlexNet Conv4 Unit23 Gradient Ascent">
     
-    <img width="1000" src="images/alexnet_zero_vs_top_patch.png" alt="AlexNet Results">
+    <p><strong>AlexNet Conv2 Unit2: </strong>As the image below demonstrates, this unit prefers a bright, ball-shaped object situated somewhere to the left of the receptive field. The three images also appear similar to each other.</p>
+    <img width="1000" src="images/alexnet_conv2_unit2_gradient_ascent.png" alt="AlexNet Conv4 Unit23 Gradient Ascent">
+
+    <p><strong>AlexNet Conv4 Unit23:</strong> As we move to deeper layers, the gradient ascent results from different initial images no longer resemble each other, and their interpretation becomes more challenging.</p>
+    <img width="1000" src="images/alexnet_conv4_unit23_gradient_ascent.png" alt="AlexNet Conv4 Unit23 Gradient Ascent">
+    
+    <p>I calculated the Pearson correlation coefficient as a measure of image similarity between the gradient ascent results, though I am uncertain about the scientific validity of using this metric. As expected, the correlation is perfect in Conv1 but sharply diminishes afterward.</p>
+    <img width="1000" src="images/alexnet_zero_vs_top_patch.png" alt="Gradient Ascent Intialization Correlation">
+    <p>Please visit the <a href="gallery.html">Gallery</a> to see more results.</p>
 
     <h2>5. References</h2>
     <ul>
