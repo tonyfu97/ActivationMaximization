@@ -1,8 +1,6 @@
-# DeepDream at the Neuron Level
+# Activation Maximization
 
-UW CSE 455 Final Project
-
-Activation Maximization (gradient ascent) (Erhan et al., 2009).
+UW CSE 455 Final Project: DeepDream at the Neuron Level, a.k.a., Activation Maximization (gradient ascent) (Erhan et al., 2009).
 
 For details, please visit the [project website](https://tonyfu97.github.io/DeepDreamAtNeuronLevel/) and [presentation](https://youtu.be/y3xN06_xzJQ).
 
